@@ -40,19 +40,23 @@ app.use((err, req, res, next) => {
   });
 });
 
-const PORT = process.env.PORT || 5000;
+// Export app and connectDB for Firebase Functions
+module.exports = { app, connectDB };
 
-// Start Server only after MongoDB Connection
-const startServer = async () => {
-  try {
-    await connectDB();
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
-    });
-  } catch (error) {
-    console.error('❌ Failed to start server due to DB connection error');
-    process.exit(1);
-  }
-};
+// Start Server locally if not running as a function
+if (require.main === module) {
+  const PORT = process.env.PORT || 5000;
+  const startServer = async () => {
+    try {
+      await connectDB();
+      app.listen(PORT, () => {
+        console.log(`🚀 Server running on port ${PORT}`);
+      });
+    } catch (error) {
+      console.error('❌ Failed to start server due to DB connection error');
+      process.exit(1);
+    }
+  };
+  startServer();
+}
 
-startServer();

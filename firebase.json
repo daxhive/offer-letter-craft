@@ -2,5 +2,10 @@
   "apphosting": {
     "backendId": "offer-letter-craft-frontend",
     "rootDirectory": "client"
+  },
+  "functions": {
+    "source": "server",
+    "runtime": "nodejs20"
   }
 }
+
