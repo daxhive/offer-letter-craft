@@ -1,0 +1,21 @@
+# App Hosting Configuration
+# For more info: https://firebase.google.com/docs/app-hosting/configure
+
+kind: "AppHostingYaml"
+apiVersion: "v1"
+
+# The directory to look for the application.
+# Since firebase.json points to 'client', this is relative to that or implicit.
+# However, usually we keep it minimal.
+
+runConfig:
+  minInstances: 0
+  maxInstances: 10
+  concurrency: 80
+  cpu: 1
+  memoryMiB: 512
+
+# Environment variables can be added here once we have the Atlas URI
+# env:
+#   - variable: NEXT_PUBLIC_API_URL
+#     value: "https://your-backend-url.a.run.app"
