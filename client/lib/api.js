@@ -1,18 +1,24 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api',
+  baseURL: 'http://localhost:5000/api', // ⚠️ make sure backend uses /api
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Add interceptor for auth token
+// ✅ FIXED interceptor
 api.interceptors.request.use((config) => {
-  const user = JSON.parse(localStorage.getItem('user'));
-  if (user && user.token) {
-    config.headers.Authorization = `Bearer ${user.token}`;
+  try {
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    if (user && user.token) {
+      config.headers.Authorization = `Bearer ${user.token}`;
+    }
+  } catch (err) {
+    console.log('No user in localStorage');
   }
+
   return config;
 });
 

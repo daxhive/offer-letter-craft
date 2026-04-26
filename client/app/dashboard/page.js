@@ -1,16 +1,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import api from '../../lib/api';
-import { 
-  Users, 
-  FileCheck, 
-  Clock, 
-  TrendingUp, 
-  Search, 
-  Filter,
+import {
+  Users,
+  FileCheck,
+  Clock,
+  TrendingUp,
   MoreVertical,
-  ChevronRight,
   Download
 } from 'lucide-react';
 import { format } from 'date-fns';
@@ -49,8 +47,10 @@ const StatusBadge = ({ status }) => {
 };
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeMenu, setActiveMenu] = useState(null);
 
   useEffect(() => {
     fetchOffers();
@@ -67,6 +67,25 @@ export default function DashboardPage() {
     }
   };
 
+  const handleMenuToggle = (id) => {
+    setActiveMenu(activeMenu === id ? null : id);
+  };
+
+  // ✅ DELETE FUNCTION
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this offer?");
+    if (!confirmDelete) return;
+
+    try {
+      await api.delete(`/offers/${id}`);
+      setOffers((prev) => prev.filter((offer) => offer._id !== id));
+      alert("Offer deleted successfully");
+    } catch (err) {
+      console.error("Delete error:", err);
+      alert("Failed to delete offer");
+    }
+  };
+
   const stats = [
     { title: 'Total Offers', value: offers.length, icon: Users, color: 'bg-blue-600', trend: '+12%' },
     { title: 'Pending Sign', value: offers.filter(o => o.status === 'SENT').length, icon: Clock, color: 'bg-amber-500', trend: '+5%' },
@@ -78,14 +97,12 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Experience Dashboard</h1>
-          <p className="text-gray-500 text-sm">Welcome back! Here's what's happening today.</p>
+          <p className="text-gray-500 text-sm">Welcome back!</p>
         </div>
-        <div className="flex space-x-3">
-          <button className="flex items-center space-x-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-all">
-            <Download className="w-4 h-4" />
-            <span>Export Reports</span>
-          </button>
-        </div>
+        <button className="flex items-center space-x-2 px-4 py-2 bg-white border rounded-xl text-sm">
+          <Download className="w-4 h-4" />
+          <span>Export Reports</span>
+        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
@@ -94,92 +111,86 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      <div className="premium-card overflow-hidden bg-white">
-        <div className="p-6 border-b border-gray-50 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-gray-900">Recent Offer Letters</h2>
-          <div className="flex items-center space-x-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input 
-                type="text" 
-                placeholder="Search candidates..." 
-                className="pl-10 pr-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-blue-500 w-64"
-              />
-            </div>
-            <button className="p-2 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all">
-              <Filter className="w-4 h-4 text-gray-500" />
-            </button>
-          </div>
+      <div className="premium-card bg-white">
+        <div className="p-6 border-b flex justify-between">
+          <h2 className="text-lg font-bold">Recent Offer Letters</h2>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="bg-gray-50/50 text-gray-500 text-xs font-bold uppercase tracking-wider">
-                <th className="px-6 py-4">Candidate</th>
-                <th className="px-6 py-4">Role & Salary</th>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4">Date Created</th>
-                <th className="px-6 py-4 text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {loading ? (
-                Array(3).fill(0).map((_, i) => (
-                  <tr key={i} className="animate-pulse">
-                    <td colSpan="5" className="px-6 py-8 h-20 bg-gray-50/20"></td>
-                  </tr>
-                ))
-              ) : offers.length === 0 ? (
-                <tr>
-                  <td colSpan="5" className="px-6 py-12 text-center text-gray-400 italic">
-                    No offer letters found. Create your first one!
-                  </td>
-                </tr>
-              ) : (
-                offers.map((offer) => (
-                  <tr key={offer._id} className="hover:bg-gray-50/80 transition-all group">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 font-bold">
-                          {offer.candidateName.charAt(0)}
-                        </div>
-                        <div>
-                          <p className="text-sm font-bold text-gray-900">{offer.candidateName}</p>
-                          <p className="text-xs text-gray-500">{offer.candidateEmail}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <p className="text-sm font-semibold text-gray-900">{offer.jobTitle}</p>
-                      <p className="text-xs text-gray-500">${offer.salary.toLocaleString()} / yr</p>
-                    </td>
-                    <td className="px-6 py-4">
-                      <StatusBadge status={offer.status} />
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {format(new Date(offer.createdAt), 'MMM dd, yyyy')}
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <button className="p-2 hover:bg-white rounded-lg transition-all border border-transparent hover:border-gray-200">
-                        <MoreVertical className="w-4 h-4 text-gray-400" />
+        <table className="w-full">
+          <tbody>
+            {offers.map((offer) => (
+              <tr key={offer._id} className="border-b">
+                <td className="px-6 py-4">{offer.candidateName}</td>
+                <td>{offer.jobTitle}</td>
+                <td><StatusBadge status={offer.status} /></td>
+                <td>
+                  {offer.createdAt
+                    ? format(new Date(offer.createdAt), 'MMM dd, yyyy')
+                    : '-'}
+                </td>
+
+                <td className="relative text-right pr-6">
+                  <button
+                    onClick={() => handleMenuToggle(offer._id)}
+                    className="p-2 hover:bg-gray-100 rounded"
+                  >
+                    <MoreVertical className="w-4 h-4" />
+                  </button>
+
+                  {activeMenu === offer._id && (
+                    <div className="absolute right-6 mt-2 w-40 bg-white border rounded-lg shadow-lg z-50">
+
+                      <button
+                        onClick={() => {
+                          router.push(`/dashboard/offers/${offer._id}`);
+                          setActiveMenu(null);
+                        }}
+                        className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                      >
+                        View
                       </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
 
-        {offers.length > 0 && (
-          <div className="p-4 border-t border-gray-50 bg-gray-50/30 flex items-center justify-between text-sm">
-            <p className="text-gray-500">Showing {offers.length} entries</p>
-            <div className="flex space-x-2">
-              <button className="px-3 py-1 bg-white border border-gray-200 rounded-lg disabled:opacity-50">Prev</button>
-              <button className="px-3 py-1 bg-white border border-gray-200 rounded-lg disabled:opacity-50">Next</button>
-            </div>
-          </div>
+                      <button
+                        onClick={() => {
+                          alert('Send functionality coming soon');
+                          setActiveMenu(null);
+                        }}
+                        className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                      >
+                        Send
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          window.open(`http://localhost:5000/api/offers/${offer._id}/download`);
+                          setActiveMenu(null);
+                        }}
+                        className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                      >
+                        Download
+                      </button>
+
+                      {/* 🔴 DELETE BUTTON */}
+                      <button
+                        onClick={() => {
+                          handleDelete(offer._id);
+                          setActiveMenu(null);
+                        }}
+                        className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50"
+                      >
+                        Delete
+                      </button>
+
+                    </div>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {offers.length === 0 && !loading && (
+          <p className="p-6 text-center text-gray-500">No offers found</p>
         )}
       </div>
     </div>

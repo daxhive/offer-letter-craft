@@ -71,10 +71,8 @@ const offerLetterSchema = new mongoose.Schema({
   },
 });
 
-offerLetterSchema.pre('save', function (next) {
+offerLetterSchema.pre('save', function () {
   this.updatedAt = Date.now();
-  next();
 });
-
 const OfferLetter = mongoose.model('OfferLetter', offerLetterSchema);
 module.exports = OfferLetter;

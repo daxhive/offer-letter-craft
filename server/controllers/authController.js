@@ -10,7 +10,7 @@ const generateToken = (id) => {
 // @desc    Register a new user
 // @route   POST /api/auth/signup
 // @access  Public (or Admin restricted depending on setup)
-exports.signup = async (req, res) => {
+exports.signup = async (req, res, next) => {
   const { name, email, password, role } = req.body;
 
   try {
@@ -46,7 +46,7 @@ exports.signup = async (req, res) => {
 // @desc    Auth user & get token
 // @route   POST /api/auth/login
 // @access  Public
-exports.login = async (req, res) => {
+exports.login = async (req, res, next) => {
   const { email, password } = req.body;
 
   try {
@@ -71,7 +71,7 @@ exports.login = async (req, res) => {
 // @desc    Get user profile
 // @route   GET /api/auth/profile
 // @access  Private
-exports.getProfile = async (req, res) => {
+exports.getProfile = async (req, res, next) => {
   const user = await User.findById(req.user._id);
 
   if (user) {

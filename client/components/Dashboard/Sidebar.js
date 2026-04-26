@@ -3,25 +3,24 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  LayoutDashboard, 
-  FilePlus, 
-  FileText, 
-  Bell, 
-  Settings, 
+import {
+  LayoutDashboard,
+  FilePlus,
+  FileText,
+  Bell,
+  Settings,
   LogOut,
   User as UserIcon
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 const SidebarItem = ({ icon: Icon, label, href, active }) => (
-  <Link 
+  <Link
     href={href}
-    className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
-      active 
-        ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' 
+    className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group ${active
+        ? 'bg-blue-600 text-white shadow-lg shadow-blue-200'
         : 'text-gray-500 hover:bg-gray-100'
-    }`}
+      }`}
   >
     <Icon className={`w-5 h-5 ${active ? 'text-white' : 'text-gray-400 group-hover:text-blue-600'}`} />
     <span className="font-semibold text-sm">{label}</span>
@@ -45,28 +44,28 @@ export default function Sidebar() {
         </div>
 
         <nav className="space-y-2">
-          <SidebarItem 
-            icon={LayoutDashboard} 
-            label="Dashboard" 
-            href="/dashboard" 
+          <SidebarItem
+            icon={LayoutDashboard}
+            label="Dashboard"
+            href="/dashboard"
             active={pathname === '/dashboard'}
           />
-          <SidebarItem 
-            icon={FilePlus} 
-            label="Create Offer" 
-            href="/dashboard/offers/create" 
+          <SidebarItem
+            icon={FilePlus}
+            label="Create Offer"
+            href="/dashboard/offers/create"
             active={pathname === '/dashboard/offers/create'}
           />
-          <SidebarItem 
-            icon={FileText} 
-            label="All Offers" 
-            href="/dashboard/offers" 
+          <SidebarItem
+            icon={FileText}
+            label="All Offers"
+            href="/dashboard/offers"
             active={pathname === '/dashboard/offers'}
           />
-          <SidebarItem 
-            icon={Bell} 
-            label="Notifications" 
-            href="/dashboard/notifications" 
+          <SidebarItem
+            icon={Bell}
+            label="Notifications"
+            href="/dashboard/notifications"
             active={pathname === '/dashboard/notifications'}
           />
         </nav>
@@ -83,7 +82,7 @@ export default function Sidebar() {
           </div>
         </div>
 
-        <button 
+        <button
           onClick={logout}
           className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 transition-all duration-200 group"
         >

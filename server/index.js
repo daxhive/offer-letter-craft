@@ -27,7 +27,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/offers', offerRoutes);
 app.use('/api/notifications', notificationRoutes);
 
-app.get('/', (req, res) => {
+app.get('/', (req, res, next) => {
   res.send('Offer Letter Management API is running...');
 });
 

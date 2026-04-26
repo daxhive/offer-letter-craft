@@ -3,7 +3,7 @@ const Notification = require('../models/Notification');
 // @desc    Get user notifications
 // @route   GET /api/notifications
 // @access  Private
-exports.getNotifications = async (req, res) => {
+exports.getNotifications = async (req, res, next) => {
   try {
     const notifications = await Notification.find({ recipient: req.user._id })
       .sort('-createdAt')
@@ -17,7 +17,7 @@ exports.getNotifications = async (req, res) => {
 // @desc    Mark notification as read
 // @route   PUT /api/notifications/:id/read
 // @access  Private
-exports.markAsRead = async (req, res) => {
+exports.markAsRead = async (req, res, next) => {
   try {
     const notification = await Notification.findById(req.params.id);
     if (notification && notification.recipient.toString() === req.user._id.toString()) {
