@@ -162,7 +162,7 @@ export default function DashboardPage() {
 
                       <button
                         onClick={() => {
-                          window.open(`http://localhost:5000/api/offers/${offer._id}/download`);
+                          window.open(`${process.env.NEXT_PUBLIC_API_URL}/offers/${offer._id}/download`);
                           setActiveMenu(null);
                         }}
                         className="block w-full text-left px-4 py-2 hover:bg-gray-100"
