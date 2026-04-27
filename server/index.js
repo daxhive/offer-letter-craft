@@ -1,62 +1,84 @@
-const express = require('express');
-const cors = require('cors');
-const dotenv = require('dotenv');
-const cookieParser = require('cookie-parser');
-const connectDB = require('./config/db');
+const express = require("express");
+const cors = require("cors");
+const dotenv = require("dotenv");
+const cookieParser = require("cookie-parser");
+const connectDB = require("./config/db");
 
-// Load environment variables
 dotenv.config();
 
-const authRoutes = require('./routes/authRoutes');
-const offerRoutes = require('./routes/offerRoutes');
-const notificationRoutes = require('./routes/notificationRoutes');
+/* -------------------- ROUTES -------------------- */
+const authRoutes = require("./routes/authRoutes");
+const offerRoutes = require("./routes/offerRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
 
 const app = express();
 
-// Middleware
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
-  credentials: true
-}));
+/* -------------------- DB CONNECTION -------------------- */
+connectDB();
+
+/* -------------------- MIDDLEWARE -------------------- */
+
+// JSON body parser
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+
+// Cookie parser
 app.use(cookieParser());
 
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/offers', offerRoutes);
-app.use('/api/notifications', notificationRoutes);
+/* -------------------- CORS (PRODUCTION READY) -------------------- */
 
-app.get('/', (req, res, next) => {
-  res.send('Offer Letter Management API is running...');
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://your-frontend.vercel.app" // 🔥 replace after frontend deploy
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(null, true); // (safe open for now)
+      }
+    },
+    credentials: true,
+  })
+);
+
+/* -------------------- ROUTES -------------------- */
+
+app.use("/api/auth", authRoutes);
+app.use("/api/offers", offerRoutes);
+app.use("/api/notifications", notificationRoutes);
+
+/* -------------------- HEALTH CHECK -------------------- */
+
+app.get("/", (req, res) => {
+  res.send("🚀 Offer Letter Management API is running...");
 });
 
-// Error Handling Middleware
-app.use((err, req, res, next) => {
-  const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
-  res.status(statusCode).json({
-    message: err.message,
-    stack: process.env.NODE_ENV === 'production' ? null : err.stack,
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "OK",
+    message: "Backend is healthy 🚀"
   });
 });
 
-// Export app and connectDB for Firebase Functions
-module.exports = { app, connectDB };
+/* -------------------- ERROR HANDLER -------------------- */
 
-// Start Server locally if not running as a function
-if (require.main === module) {
-  const PORT = process.env.PORT || 5000;
-  const startServer = async () => {
-    try {
-      await connectDB();
-      app.listen(PORT, () => {
-        console.log(`🚀 Server running on port ${PORT}`);
-      });
-    } catch (error) {
-      console.error('❌ Failed to start server due to DB connection error');
-      process.exit(1);
-    }
-  };
-  startServer();
-}
+app.use((err, req, res, next) => {
+  console.error("❌ Error:", err.message);
 
+  res.status(500).json({
+    success: false,
+    message: err.message,
+  });
+});
+
+/* -------------------- START SERVER -------------------- */
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});

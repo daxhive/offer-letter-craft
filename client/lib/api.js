@@ -1,22 +1,24 @@
-import axios from 'axios';
+import axios from "axios";
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api', // ⚠️ make sure backend uses /api
+  baseURL: "http://localhost:5000/api",
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
-// ✅ FIXED interceptor
+// Attach JWT token automatically
 api.interceptors.request.use((config) => {
   try {
-    const user = JSON.parse(localStorage.getItem('user'));
+    if (typeof window !== "undefined") {
+      const user = JSON.parse(localStorage.getItem("user"));
 
-    if (user && user.token) {
-      config.headers.Authorization = `Bearer ${user.token}`;
+      if (user?.token) {
+        config.headers.Authorization = `Bearer ${user.token}`;
+      }
     }
   } catch (err) {
-    console.log('No user in localStorage');
+    console.log("No user in localStorage");
   }
 
   return config;
