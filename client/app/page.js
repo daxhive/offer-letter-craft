@@ -1,27 +1,39 @@
-'use client';
-
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '../context/AuthContext';
-
 export default function Home() {
-  const router = useRouter();
-  const { user, loading } = useAuth();
-
-  useEffect(() => {
-    if (!loading) {
-      if (user) {
-        router.push('/dashboard');
-      } else {
-        router.push('/auth/login');
-      }
-    }
-  }, [user, loading, router]);
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white">
-      <div className="animate-pulse text-blue-600 font-bold tracking-widest uppercase">
-        LuxeHR Loading...
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "#ffffff",
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
+      <div
+        style={{
+          textAlign: "center",
+        }}
+      >
+        <h1
+          style={{
+            fontSize: "32px",
+            fontWeight: "700",
+            color: "#2563eb",
+            marginBottom: "12px",
+          }}
+        >
+          LuxeHR Deployment Success 🚀
+        </h1>
+
+        <p
+          style={{
+            fontSize: "16px",
+            color: "#4b5563",
+          }}
+        >
+          Frontend deployed successfully on Vercel
+        </p>
       </div>
     </div>
   );
