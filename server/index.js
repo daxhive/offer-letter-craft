@@ -25,20 +25,21 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 // Cookie parser
 app.use(cookieParser());
 
-/* -------------------- CORS (PRODUCTION READY) -------------------- */
+/* -------------------- CORS (FIXED PRODUCTION VERSION) -------------------- */
 
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://your-frontend.vercel.app" // 🔥 replace after frontend deploy
+  "https://offer-letter-craft.vercel.app"
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
+      // Allow Postman / server-to-server / browser requests
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(null, true); // (safe open for now)
+        callback(new Error("Not allowed by CORS"));
       }
     },
     credentials: true,
